@@ -9,10 +9,9 @@ def calculate_fractional_part():
 
         # Вычисляем дробную часть
         f_part = x - int(x)
-        rounded = round(f_part, 15)
 
         # Выводим результат в метку
-        result_label.config(text=f"Дробная часть: {rounded}")
+        result_label.config(text=f"Дробная часть: {f_part}")
     except ValueError:
         # Если введено не число, показываем сообщение об ошибке
         messagebox.showerror("Ошибка", "Введите корректное вещественное число!")
