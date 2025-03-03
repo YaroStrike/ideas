@@ -28,7 +28,7 @@ $title = "сайт привет герман";
     <label for="color2">Черный</label>
     <input type="radio" name="color" id="color3" value="green">
     <label for="color3">Зеленый</label>
-    <input type="submit" value="Отправить">
+    <input type="submit" value="Обработать данные">
 </form>
 </body>
 </html>
