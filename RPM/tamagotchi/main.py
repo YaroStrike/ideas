@@ -10,7 +10,8 @@ os.chdir(script_directory)
 pygame.init()
 
 # Constants
-WIDTH, HEIGHT = 1920, 1080
+info = pygame.display.Info()
+WIDTH, HEIGHT = info.current_w, info.current_h
 background_image = pygame.image.load('room.png')
 background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 FPS = 60
@@ -25,8 +26,13 @@ pet_images = {
     'hungry': pygame.image.load('redd-hungry.png'),
     'sleeping': pygame.image.load('redd-sleep.png'),
     'food': pygame.image.load('food.png'),
+<<<<<<< HEAD
     'food2': pygame.image.load('food2.png'),
     'sad': pygame.image.load('redd-sad.png')
+=======
+    'sad': pygame.image.load('redd-sad.png'),
+    'feeding': pygame.image.load('redd-feeding.png')  # Added feeding state
+>>>>>>> 0778cfc1b1bb2514568056137021f7c90936cb95
 }
 
 # Scale pet images
@@ -39,6 +45,10 @@ hunger = 100
 energy = 100
 pet_state = 'happy'
 pet_position = (WIDTH // 2 - 280, HEIGHT // 2 - 223)  # Initial pet position
+
+# Add a variable to track the feeding start time
+feeding_start_time = 0
+feeding_duration = 2000  # 2 seconds in milliseconds
 
 # Create window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -64,6 +74,7 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+<<<<<<< HEAD
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Left mouse button
@@ -86,6 +97,27 @@ while True:
 
         if dragging_food:
             food_position = event.pos  # Move food with cursor
+=======
+        # Example interactions
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:  # Pet the Tamagotchi
+                happiness = min(happiness + 10, 100)
+            elif event.key == pygame.K_f:  # Feed the Tamagotchi
+                hunger = min(hunger + 20, 100)
+                pet_state = 'feeding'  # Change state to feeding
+                feeding_start_time = pygame.time.get_ticks()  # Record the start time
+            elif event.key == pygame.K_s:  # Sleep the Tamagotchi
+                pet_state = 'sleeping'
+            elif event.key == pygame.K_w:  # Wake the Tamagotchi
+                happiness = max(happiness - 5, 0)
+        
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+            mouse_pos = event.pos  # This is safe as it's within the mouse event check
+            if sleep_button.collidepoint(mouse_pos):
+                pet_state = 'sleeping'
+            elif wake_button.collidepoint(mouse_pos):
+                happiness = max(happiness - 5, 0)
+>>>>>>> 0778cfc1b1bb2514568056137021f7c90936cb95
 
     # Decrease stats over time
     happiness = max(happiness - 3 / FPS, 0)
@@ -101,8 +133,13 @@ while True:
         pet_state = 'hungry'
     elif happiness < 50:
         pet_state = 'sad'
-    else:
+    elif pet_state != 'feeding':
         pet_state = 'happy'
+
+    # In the main loop, check if the feeding duration has passed
+    if pet_state == 'feeding':
+        if pygame.time.get_ticks() - feeding_start_time > feeding_duration:
+            pet_state = 'happy'  # Change back to happy state after feeding
 
     screen.blit(background_image, (0, 0))
     screen.blit(pet_images[pet_state], pet_position)  # Use pet_position here

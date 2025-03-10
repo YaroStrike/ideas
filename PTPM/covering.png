@@ -1,0 +1,4 @@
+pip3 install https://github.com/kivymd/KivyMD/archive/master.zip
+pip3 install setuptools
+pip3 install Cython==0.29.33
+
