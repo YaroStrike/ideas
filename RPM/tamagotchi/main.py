@@ -1,3 +1,4 @@
+# Pet Position
 import pygame
 import sys
 import os
@@ -24,22 +25,30 @@ pet_images = {
     'hungry': pygame.image.load('redd-hungry.png'),
     'sleeping': pygame.image.load('redd-sleep.png'),
     'food': pygame.image.load('food.png'),
+    'food2': pygame.image.load('food2.png'),
     'sad': pygame.image.load('redd-sad.png')
 }
 
 # Scale pet images
 for key in pet_images:
-    pet_images[key] = pygame.transform.scale(pet_images[key], (600, 600))
+    pet_images[key] = pygame.transform.scale(pet_images[key], (560, 446))
 
 # Initial pet stats
 happiness = 100
 hunger = 100
 energy = 100
 pet_state = 'happy'
+pet_position = (WIDTH // 2 - 280, HEIGHT // 2 - 223)  # Initial pet position
 
 # Create window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Tamagotchi')
+
+# Food position
+food_position = (WIDTH // 2 - 50, HEIGHT - 200)
+food_visible = True
+
+dragging_food = False
 
 # Font for displaying stats
 font = pygame.font.Font(None, 48)
@@ -55,16 +64,6 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        # Example interactions
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_p:  # Pet the Tamagotchi
-                happiness = min(happiness + 10, 100)
-            elif event.key == pygame.K_f:  # Feed the Tamagotchi
-                hunger = min(hunger + 20, 100)
-            elif event.key == pygame.K_s:  # Sleep the Tamagotchi
-                pet_state = 'sleeping'
-            elif event.key == pygame.K_w:  # Wake the Tamagotchi
-                happiness = max(happiness - 5, 0)
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Left mouse button
@@ -72,10 +71,21 @@ while True:
                     pet_state = 'sleeping'
                 elif wake_button.collidepoint(event.pos):
                     happiness = max(happiness - 5, 0)
-        
-        if event.type == pygame.DROPFILE:
-            if event.file == 'food.png':
-                hunger = min(hunger + 20, 100)
+                elif food_visible and food_position[0] <= event.pos[0] <= food_position[0] + 100 and food_position[1] <= event.pos[1] <= food_position[1] + 100:
+                    hunger = min(hunger + 20, 100)
+                    food_visible = False
+                elif food_visible and food_position[0] <= event.pos[0] <= food_position[0] + 100 and food_position[1] <= event.pos[1] <= food_position[1] + 100:
+                    dragging_food = True
+
+        if event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:
+                dragging_food = False
+                if not food_visible:
+                    food_visible = True
+                    food_position = (WIDTH // 2 - 50, HEIGHT - 200)
+
+        if dragging_food:
+            food_position = event.pos  # Move food with cursor
 
     # Decrease stats over time
     happiness = max(happiness - 3 / FPS, 0)
@@ -85,7 +95,7 @@ while True:
     energy = max(energy - 1 / FPS, 0)
 
     # Update screen
-    if energy < 20 or sleep_button.collidepoint(event.pos):
+    if energy < 20:
         pet_state = 'sleeping'
     elif hunger < 50:
         pet_state = 'hungry'
@@ -95,8 +105,14 @@ while True:
         pet_state = 'happy'
 
     screen.blit(background_image, (0, 0))
-    screen.blit(pet_images[pet_state], (WIDTH // 2 - pet_images[pet_state].get_width() // 2, HEIGHT // 2 - pet_images[pet_state].get_height() // 2.5))
+    screen.blit(pet_images[pet_state], pet_position)  # Use pet_position here
     
+    # Draw food
+    if food_visible:
+        screen.blit(pet_images['food'], food_position)
+    else:
+        screen.blit(pet_images['food2'], food_position)
+
     # Draw buttons
     pygame.draw.rect(screen, WHITE, sleep_button)
     pygame.draw.rect(screen, WHITE, wake_button)
